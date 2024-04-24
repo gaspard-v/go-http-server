@@ -10,14 +10,15 @@ const DEFAULT_ADDRESS string = "127.0.0.1"
 const DEFAULT_PORT string = "8080"
 
 type Tcp struct {
-	Listener net.TCPListener
+	Listener    net.TCPListener
+	tcpConsumer TcpConsumer
 }
 
-func CreateDefault() *Tcp {
-	return Create(fmt.Sprintf("%s:%s", DEFAULT_ADDRESS, DEFAULT_PORT))
+func CreateDefault(tcpConsumer TcpConsumer) *Tcp {
+	return Create(fmt.Sprintf("%s:%s", DEFAULT_ADDRESS, DEFAULT_PORT), tcpConsumer)
 }
 
-func Create(address string) *Tcp {
+func Create(address string, tcpConsumer TcpConsumer) *Tcp {
 	tcpAddr, error := net.ResolveTCPAddr("tcp", address)
 	if error != nil {
 		log.Fatalln(error)
@@ -26,7 +27,7 @@ func Create(address string) *Tcp {
 	if error != nil {
 		log.Fatalln(error)
 	}
-	tcp := Tcp{*listener}
+	tcp := Tcp{*listener, tcpConsumer}
 	return &tcp
 }
 
@@ -38,23 +39,6 @@ func (tcp *Tcp) Accept() {
 			continue
 		}
 
-		// Handle the connection in a new goroutine
-		go handleConnection(conn)
+		go tcp.tcpConsumer.OnAccept(conn)
 	}
-}
-
-func handleConnection(conn net.Conn) {
-	// Close the connection when we're done
-	defer conn.Close()
-
-	// Read incoming data
-	buf := make([]byte, 1024)
-	_, err := conn.Read(buf)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Print the incoming data
-	fmt.Printf("Received: %s", buf)
 }
