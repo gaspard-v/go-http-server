@@ -3,5 +3,5 @@ package tcp
 import "net"
 
 type TcpConsumer interface {
-	OnAccept(*net.TCPConn)
+	OnAccept(*net.TCPConn) uint64
 }

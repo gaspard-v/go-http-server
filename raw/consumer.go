@@ -1,13 +1,15 @@
 package raw
 
 import (
-	"errors"
+	"encoding/binary"
 	"fmt"
 	"net"
 
-	"github.com/gaspard-v/go-http-server/conv"
 	"github.com/gaspard-v/go-http-server/log"
 )
+
+const HEADER_SIZE = 4
+const CHUNK_SIZE = 4096
 
 type RawConsumer struct {
 	logger log.LogConsumerInterface
@@ -17,20 +19,38 @@ func CreateRaw(logger log.LogConsumerInterface) *RawConsumer {
 	return &RawConsumer{logger}
 }
 
-func (raw *RawConsumer) OnAccept(conn *net.TCPConn) {
+func getBodySize(conn *net.TCPConn) (uint64, error) {
+	var body_size uint64 = 0
+	err := binary.Read(conn, binary.BigEndian, body_size)
+	if err != nil {
+		return 0, err
+	}
+	return body_size, nil
+}
+
+func onChunck(chunk *[]byte) {
+	fmt.Println(chunk)
+}
+
+func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
 	defer conn.Close()
-	header_size := 4
-	header_buf := make([]byte, header_size)
-	n, err := conn.Read(header_buf)
+	body_size, err := getBodySize(conn)
 	if err != nil {
 		raw.logger.OnFatal(err)
 	}
-	if header_size != n {
-		raw.logger.OnFatal(errors.New("incorrect read size"))
+	chunk := make([]byte, CHUNK_SIZE)
+	bytes_read := uint64(0)
+	for bytes_read <= body_size {
+		remaining := body_size - bytes_read
+		if remaining < CHUNK_SIZE {
+			chunk = make([]byte, remaining)
+		}
+		err = binary.Read(conn, binary.BigEndian, chunk)
+		if err != nil {
+			raw.logger.OnFatal(err)
+		}
+		bytes_read += (uint64(len(chunk)))
+		onChunck(&chunk)
 	}
-	adapter := conv.CreateBytesArrayAdapter(&header_buf)
-	body_size := adapter.ToUint64()
-	buf := make([]byte, body_size)
-	conn.Read(buf)
-	fmt.Println(buf)
+	return bytes_read
 }
