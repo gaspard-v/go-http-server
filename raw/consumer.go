@@ -19,7 +19,7 @@ func CreateRaw(logger log.LogConsumerInterface) *RawConsumer {
 	return &RawConsumer{logger}
 }
 
-func getBodySize(conn *net.TCPConn) (uint64, error) {
+func GetBodySize(conn *net.TCPConn) (uint64, error) {
 	var body_size uint64 = 0
 	err := binary.Read(conn, binary.BigEndian, body_size)
 	if err != nil {
@@ -55,7 +55,7 @@ func (raw *RawConsumer) splitInChunk(
 
 func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
 	defer conn.Close()
-	body_size, err := getBodySize(conn)
+	body_size, err := GetBodySize(conn)
 	if err != nil {
 		raw.logger.Fatal(err)
 	}
