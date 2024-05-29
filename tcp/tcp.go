@@ -11,7 +11,7 @@ const DEFAULT_ADDRESS string = "127.0.0.1"
 const DEFAULT_PORT string = "8080"
 
 type Tcp struct {
-	Listener    net.TCPListener
+	Listener    *net.TCPListener
 	tcpConsumer TcpConsumer
 	logger      log.LogConsumerInterface
 }
@@ -41,7 +41,7 @@ func Create(
 	if error != nil {
 		logger.Fatal(error)
 	}
-	tcp := Tcp{*listener, tcpConsumer, logger}
+	tcp := Tcp{listener, tcpConsumer, logger}
 	return &tcp
 }
 

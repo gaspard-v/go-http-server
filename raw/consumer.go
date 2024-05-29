@@ -29,7 +29,7 @@ func getBodySize(conn *net.TCPConn) (uint64, error) {
 }
 
 func consumeChunk(chunk *[]byte) {
-	fmt.Println(chunk)
+	fmt.Print(chunk)
 }
 
 func (raw *RawConsumer) splitInChunk(

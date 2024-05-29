@@ -10,7 +10,7 @@ import (
 
 func main() {
 	logger := log.CreateConsoleLog("main")
-	logger.Message(errors.New("Starting server"))
+	logger.Message(errors.New("starting server"))
 	rawConsumer := raw.CreateRaw(logger)
 	tcp := tcp.CreateDefault(rawConsumer, logger)
 	tcp.Accept()
