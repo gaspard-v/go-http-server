@@ -28,16 +28,14 @@ func getBodySize(conn *net.TCPConn) (uint64, error) {
 	return body_size, nil
 }
 
-func onChunck(chunk *[]byte) {
+func consumeChunk(chunk *[]byte) {
 	fmt.Println(chunk)
 }
 
-func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
-	defer conn.Close()
-	body_size, err := getBodySize(conn)
-	if err != nil {
-		raw.logger.OnFatal(err)
-	}
+func (raw *RawConsumer) splitInChunk(
+	conn *net.TCPConn,
+	body_size uint64,
+) uint64 {
 	chunk := make([]byte, CHUNK_SIZE)
 	bytes_read := uint64(0)
 	for bytes_read <= body_size {
@@ -45,12 +43,21 @@ func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
 		if remaining < CHUNK_SIZE {
 			chunk = make([]byte, remaining)
 		}
-		err = binary.Read(conn, binary.BigEndian, chunk)
+		err := binary.Read(conn, binary.BigEndian, chunk)
 		if err != nil {
-			raw.logger.OnFatal(err)
+			raw.logger.Fatal(err)
 		}
 		bytes_read += (uint64(len(chunk)))
-		onChunck(&chunk)
+		consumeChunk(&chunk)
 	}
 	return bytes_read
+}
+
+func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
+	defer conn.Close()
+	body_size, err := getBodySize(conn)
+	if err != nil {
+		raw.logger.Fatal(err)
+	}
+	return raw.splitInChunk(conn, body_size)
 }

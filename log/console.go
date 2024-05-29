@@ -9,13 +9,13 @@ type ConsoleLog struct {
 	moduleName string
 }
 
-// OnPanic(error)
-// OnFatal(error)
-// OnError(error)
-// OnWarning(error)
-// OnNotice(error)
-// OnMessage(error)
-// OnDebug(error)
+// Panic(error)
+// Fatal(error)
+// Error(error)
+// Warning(error)
+// Notice(error)
+// Message(error)
+// Debug(error)
 // SetModuleName(string)
 
 func CreateConsoleLog(moduleName string) *ConsoleLog {
@@ -31,37 +31,37 @@ func (logger *ConsoleLog) SetModuleName(moduleName string) {
 	logger.moduleName = moduleName
 }
 
-func (logger *ConsoleLog) OnPanic(err error) {
+func (logger *ConsoleLog) Panic(err error) {
 	logger.setLogPrefix("PANIC")
 	log.Panicln(err)
 }
 
-func (logger *ConsoleLog) OnFatal(err error) {
+func (logger *ConsoleLog) Fatal(err error) {
 	logger.setLogPrefix("FATAL")
 	log.Fatalln(err)
 }
 
-func (logger *ConsoleLog) OnError(err error) {
+func (logger *ConsoleLog) Error(err error) {
 	logger.setLogPrefix("ERROR")
 	log.Println(err)
 }
 
-func (logger *ConsoleLog) OnWarning(err error) {
+func (logger *ConsoleLog) Warning(err error) {
 	logger.setLogPrefix("WARNING")
 	log.Println(err)
 }
 
-func (logger *ConsoleLog) OnNotice(err error) {
+func (logger *ConsoleLog) Notice(err error) {
 	logger.setLogPrefix("NOTICE")
 	log.Println(err)
 }
 
-func (logger *ConsoleLog) OnMessage(err error) {
+func (logger *ConsoleLog) Message(err error) {
 	logger.setLogPrefix("MESSAGE")
 	log.Println(err)
 }
 
-func (logger *ConsoleLog) OnDebug(err error) {
+func (logger *ConsoleLog) Debug(err error) {
 	logger.setLogPrefix("DEBUG")
 	log.Println(err)
 }

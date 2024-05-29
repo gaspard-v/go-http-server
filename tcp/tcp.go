@@ -35,11 +35,11 @@ func Create(
 ) *Tcp {
 	tcpAddr, error := net.ResolveTCPAddr("tcp", address)
 	if error != nil {
-		logger.OnFatal(error)
+		logger.Fatal(error)
 	}
 	listener, error := net.ListenTCP(tcpAddr.Network(), tcpAddr)
 	if error != nil {
-		logger.OnFatal(error)
+		logger.Fatal(error)
 	}
 	tcp := Tcp{*listener, tcpConsumer, logger}
 	return &tcp
@@ -49,7 +49,7 @@ func (tcp *Tcp) Accept() {
 	for {
 		conn, error := tcp.Listener.AcceptTCP()
 		if error != nil {
-			tcp.logger.OnDebug(error)
+			tcp.logger.Debug(error)
 			continue
 		}
 

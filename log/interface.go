@@ -1,13 +1,13 @@
 package log
 
 type LogConsumerInterface interface {
-	OnPanic(error)
-	OnFatal(error)
-	OnError(error)
-	OnWarning(error)
-	OnNotice(error)
-	OnMessage(error)
-	OnDebug(error)
+	Panic(error)
+	Fatal(error)
+	Error(error)
+	Warning(error)
+	Notice(error)
+	Message(error)
+	Debug(error)
 
 	SetModuleName(string)
 }
