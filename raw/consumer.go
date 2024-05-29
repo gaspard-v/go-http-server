@@ -6,17 +6,28 @@ import (
 	"net"
 
 	"github.com/gaspard-v/go-http-server/log"
+	"github.com/gaspard-v/go-http-server/tcp"
 )
 
 const HEADER_SIZE = 4
 const CHUNK_SIZE = 4096
 
 type RawConsumer struct {
+	logger          log.LogConsumerInterface
+	tcpConnConsumer tcp.TcpConnConsumer
+}
+
+type RawConnConsumer struct {
 	logger log.LogConsumerInterface
+	conn   *net.TCPConn
 }
 
 func CreateRaw(logger log.LogConsumerInterface) *RawConsumer {
-	return &RawConsumer{logger}
+	return &RawConsumer{logger, nil}
+}
+
+func CreateRawConn(logger log.LogConsumerInterface, conn *net.TCPConn) *RawConnConsumer {
+	return &RawConnConsumer{logger, conn}
 }
 
 func GetBodySize(conn *net.TCPConn) (uint64, error) {
@@ -32,7 +43,7 @@ func consumeChunk(chunk *[]byte) {
 	fmt.Print(chunk)
 }
 
-func (raw *RawConsumer) splitInChunk(
+func (raw *RawConnConsumer) splitInChunk(
 	conn *net.TCPConn,
 	body_size uint64,
 ) uint64 {
@@ -53,11 +64,20 @@ func (raw *RawConsumer) splitInChunk(
 	return bytes_read
 }
 
-func (raw *RawConsumer) OnAccept(conn *net.TCPConn) uint64 {
-	defer conn.Close()
-	body_size, err := GetBodySize(conn)
+func (raw *RawConnConsumer) OnReceive() uint64 {
+	body_size, err := GetBodySize(raw.conn)
 	if err != nil {
 		raw.logger.Fatal(err)
 	}
-	return raw.splitInChunk(conn, body_size)
+	return raw.splitInChunk(raw.conn, body_size)
+}
+
+func (raw *RawConnConsumer) OnSend() uint64 {
+	return 0
+}
+
+func (raw *RawConsumer) OnAccept(conn *net.TCPConn) {
+	defer conn.Close()
+	raw.tcpConnConsumer = CreateRawConn(raw.logger, conn)
+	raw.tcpConnConsumer.OnReceive()
 }
