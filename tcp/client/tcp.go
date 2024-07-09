@@ -47,4 +47,6 @@ func (tcpClient *TcpClient) Connect() {
 		tcpClient.logger.Fatal(error)
 	}
 	go tcpClient.tcpClientConsumer.OnConnected(conn)
+
+	//TODO wait for goroutine!!
 }
