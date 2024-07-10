@@ -31,37 +31,37 @@ func (logger *ConsoleLog) SetModuleName(moduleName string) {
 	logger.moduleName = moduleName
 }
 
-func (logger *ConsoleLog) Panic(err error) {
+func (logger *ConsoleLog) Panic(msg any) {
 	logger.setLogPrefix("PANIC")
-	log.Panicln(err)
+	log.Panicln(msg)
 }
 
-func (logger *ConsoleLog) Fatal(err error) {
+func (logger *ConsoleLog) Fatal(msg any) {
 	logger.setLogPrefix("FATAL")
-	log.Fatalln(err)
+	log.Fatalln(msg)
 }
 
-func (logger *ConsoleLog) Error(err error) {
+func (logger *ConsoleLog) Error(msg any) {
 	logger.setLogPrefix("ERROR")
-	log.Println(err)
+	log.Println(msg)
 }
 
-func (logger *ConsoleLog) Warning(err error) {
+func (logger *ConsoleLog) Warning(msg any) {
 	logger.setLogPrefix("WARNING")
-	log.Println(err)
+	log.Println(msg)
 }
 
-func (logger *ConsoleLog) Notice(err error) {
+func (logger *ConsoleLog) Notice(msg any) {
 	logger.setLogPrefix("NOTICE")
-	log.Println(err)
+	log.Println(msg)
 }
 
-func (logger *ConsoleLog) Message(err error) {
+func (logger *ConsoleLog) Message(msg any) {
 	logger.setLogPrefix("MESSAGE")
-	log.Println(err)
+	log.Println(msg)
 }
 
-func (logger *ConsoleLog) Debug(err error) {
+func (logger *ConsoleLog) Debug(msg any) {
 	logger.setLogPrefix("DEBUG")
-	log.Println(err)
+	log.Println(msg)
 }

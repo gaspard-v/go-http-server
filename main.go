@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"sync"
 
 	"github.com/gaspard-v/go-http-server/log"
 	rawServer "github.com/gaspard-v/go-http-server/raw"
@@ -10,15 +10,17 @@ import (
 	tcpClient "github.com/gaspard-v/go-http-server/tcp/client"
 )
 
-func startServer(logger *log.ConsoleLog, onReady func(*log.ConsoleLog)) {
-	logger.Message(errors.New("starting server"))
+func startServer(logger *log.ConsoleLog, wg *sync.WaitGroup, isReady chan bool) {
+	defer wg.Done()
+	logger.Message("starting server")
 	rawConsumer := rawServer.CreateRaw(logger)
 	tcp := tcpServer.CreateDefault(rawConsumer, logger)
+	isReady <- true
 	tcp.Accept()
-	go onReady(logger)
 }
 
-func startClient(logger *log.ConsoleLog) {
+func startClient(logger *log.ConsoleLog, wg *sync.WaitGroup) {
+	defer wg.Done()
 	client := rawClient.CreateRaw(logger)
 	tcp := tcpClient.CreateDefault(client, logger)
 	tcp.Connect()
@@ -26,5 +28,13 @@ func startClient(logger *log.ConsoleLog) {
 
 func main() {
 	logger := log.CreateConsoleLog("main")
-	go startServer(logger, startClient)
+	var wg sync.WaitGroup
+	isReady := make(chan bool)
+	wg.Add(1)
+	go startServer(logger, &wg, isReady)
+	if <-isReady {
+		wg.Add(1)
+		go startClient(logger, &wg)
+	}
+	wg.Wait()
 }

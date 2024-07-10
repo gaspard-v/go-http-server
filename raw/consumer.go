@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"sync"
 
 	"github.com/gaspard-v/go-http-server/log"
 	"github.com/gaspard-v/go-http-server/tcp"
@@ -76,8 +77,9 @@ func (raw *RawConnConsumer) OnSend() uint64 {
 	return 0
 }
 
-func (raw *RawConsumer) OnAccept(conn *net.TCPConn) {
+func (raw *RawConsumer) OnAccept(conn *net.TCPConn, wg *sync.WaitGroup) {
 	defer conn.Close()
+	defer wg.Done()
 	raw.tcpConnConsumer = CreateRawConn(raw.logger, conn)
 	raw.tcpConnConsumer.OnReceive()
 }

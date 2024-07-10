@@ -17,6 +17,7 @@ func CreateRaw(logger log.LogConsumerInterface) *RawClientConsumer {
 }
 
 func (rawClient *RawClientConsumer) readBody(conn *net.TCPConn) uint64 {
+	rawClient.logger.Debug("Client is waiting data...")
 	bodySize, error := raw.GetBodySize(conn)
 	if error != nil {
 		rawClient.logger.Fatal(error)

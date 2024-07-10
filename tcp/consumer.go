@@ -1,9 +1,12 @@
 package tcp
 
-import "net"
+import (
+	"net"
+	"sync"
+)
 
 type TcpConsumer interface {
-	OnAccept(*net.TCPConn)
+	OnAccept(*net.TCPConn, *sync.WaitGroup)
 }
 
 type TcpConnConsumer interface {
