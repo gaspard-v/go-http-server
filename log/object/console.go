@@ -14,7 +14,7 @@ func CreateConsole(moduleName string) LogInterface {
 }
 
 func (logger ConsoleLog) setLogPrefix(prefix string) {
-	fullPrefix := fmt.Sprintf("%s | %s ", logger.moduleName, prefix)
+	fullPrefix := fmt.Sprintf("[%s] module %s", prefix, logger.moduleName)
 	log.SetPrefix(fullPrefix)
 }
 
