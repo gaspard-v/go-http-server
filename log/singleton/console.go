@@ -12,7 +12,7 @@ type ConsoleLog struct{}
 
 var consoleLogInstance *ConsoleLog
 
-func getInstance() *ConsoleLog {
+func GetInstance() LogInterface {
 	if consoleLogInstance != nil {
 		return consoleLogInstance
 	}
