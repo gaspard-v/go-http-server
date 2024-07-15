@@ -1,4 +1,4 @@
-package log
+package object
 
 import (
 	"fmt"
@@ -8,15 +8,6 @@ import (
 type ConsoleLog struct {
 	moduleName string
 }
-
-// Panic(error)
-// Fatal(error)
-// Error(error)
-// Warning(error)
-// Notice(error)
-// Message(error)
-// Debug(error)
-// SetModuleName(string)
 
 func CreateConsoleLog(moduleName string) *ConsoleLog {
 	return &ConsoleLog{moduleName}

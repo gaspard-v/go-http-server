@@ -1,6 +1,6 @@
-package log
+package object
 
-type LogConsumerInterface interface {
+type LogInterface interface {
 	Panic(any)
 	Fatal(any)
 	Error(any)

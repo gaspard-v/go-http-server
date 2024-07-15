@@ -78,8 +78,8 @@ func (raw *RawConnConsumer) OnSend() uint64 {
 }
 
 func (raw *RawConsumer) OnAccept(conn *net.TCPConn, wg *sync.WaitGroup) {
-	defer conn.Close()
 	defer wg.Done()
 	raw.tcpConnConsumer = CreateRawConn(raw.logger, conn)
 	raw.tcpConnConsumer.OnReceive()
+	conn.Close()
 }
