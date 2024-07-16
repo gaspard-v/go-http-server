@@ -1,52 +1,48 @@
-package tcp
+package tcpServer
 
 import (
 	"fmt"
 	"net"
 	"sync"
 
-	"github.com/gaspard-v/go-http-server/log"
+	log "github.com/gaspard-v/go-http-server/log/object"
 )
 
 const DEFAULT_ADDRESS string = "127.0.0.1"
 const DEFAULT_PORT string = "8080"
 
 type Tcp struct {
-	Listener    *net.TCPListener
-	tcpConsumer TcpConsumer
-	logger      log.LogConsumerInterface
-	stopLoop    chan bool
+	Listener *net.TCPListener
+	tcpSock  TcpSockInterface
+	log      log.LogInterface
+	stopLoop chan bool
 }
 
-func CreateDefault(
-	tcpConsumer TcpConsumer,
-	logger log.LogConsumerInterface,
+func Default(
+	tcpSock TcpSockInterface,
 ) *Tcp {
 	address := fmt.Sprintf("%s:%s", DEFAULT_ADDRESS, DEFAULT_PORT)
-	stopLoop := make(chan bool)
 	return Create(
 		address,
-		tcpConsumer,
-		logger,
-		stopLoop,
+		tcpSock,
 	)
 }
 
 func Create(
 	address string,
-	tcpConsumer TcpConsumer,
-	logger log.LogConsumerInterface,
-	stopLoop chan bool,
+	tcpSock TcpSockInterface,
 ) *Tcp {
 	tcpAddr, error := net.ResolveTCPAddr("tcp", address)
+	stopLoop := make(chan bool)
+	log := log.Get("tcp.server")
 	if error != nil {
-		logger.Fatal(error)
+		log.Fatal(error)
 	}
 	listener, error := net.ListenTCP(tcpAddr.Network(), tcpAddr)
 	if error != nil {
-		logger.Fatal(error)
+		log.Fatal(error)
 	}
-	tcp := Tcp{listener, tcpConsumer, logger, stopLoop}
+	tcp := Tcp{listener, tcpSock, log, stopLoop}
 	return &tcp
 }
 
@@ -61,13 +57,13 @@ Exit:
 		}
 		conn, error := tcp.Listener.AcceptTCP()
 		if error != nil {
-			tcp.logger.Debug(error)
+			tcp.log.Debug(error)
 			continue
 		}
 
-		tcp.logger.Debug("Server got a client " + conn.RemoteAddr().String() + ", calling OnAccept callback")
+		tcp.log.Debug("Server got a client " + conn.RemoteAddr().String() + ", calling OnAccept callback")
 		wg.Add(1)
-		go tcp.tcpConsumer.OnAccept(conn, &wg)
+		go tcp.tcpSock.OnAccept(conn, &wg)
 	}
 	wg.Wait()
 }

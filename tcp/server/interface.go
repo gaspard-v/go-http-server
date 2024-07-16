@@ -1,15 +1,15 @@
-package tcp
+package tcpServer
 
 import (
 	"net"
 	"sync"
 )
 
-type TcpConsumer interface {
+type TcpSockInterface interface {
 	OnAccept(*net.TCPConn, *sync.WaitGroup)
 }
 
-type TcpConnConsumer interface {
+type TcpConnInterface interface {
 	OnReceive() uint64
 	OnSend() uint64
 }
