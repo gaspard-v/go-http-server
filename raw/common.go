@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func GetBodySize(conn *net.TCPConn) (uint64, error) {
+func getBodySize(conn *net.TCPConn) (uint64, error) {
 	var body_size uint64 = 0
 	err := binary.Read(conn, binary.BigEndian, body_size)
 	if err != nil {

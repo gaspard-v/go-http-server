@@ -3,6 +3,7 @@ package tcpClient
 import (
 	"fmt"
 	"net"
+	"sync"
 
 	log "github.com/gaspard-v/go-http-server/log/object"
 )
@@ -39,12 +40,12 @@ func Create(
 	return &tcpClient
 }
 
-func (tcpClient *TcpClient) Connect() {
+func (tcpClient *TcpClient) Connect() *sync.WaitGroup {
+	var wg sync.WaitGroup
 	conn, error := net.DialTCP("tcp", nil, tcpClient.tcpAddr)
 	if error != nil {
 		tcpClient.log.Fatal(error)
 	}
-	go tcpClient.tcpClientSock.OnConnected(conn)
-
-	//TODO wait for goroutine!!
+	go tcpClient.tcpClientSock.OnConnected(conn, &wg)
+	return &wg
 }

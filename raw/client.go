@@ -1,8 +1,10 @@
 package raw
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
+	"sync"
 
 	log "github.com/gaspard-v/go-http-server/log/object"
 )
@@ -18,7 +20,7 @@ func CreateRawClient() *RawClient {
 
 func (rawClient *RawClient) readBody(conn *net.TCPConn) uint64 {
 	rawClient.log.Debug("Client is waiting data...")
-	bodySize, error := GetBodySize(conn)
+	bodySize, error := getBodySize(conn)
 	// bodySize := 1
 	if error != nil {
 		rawClient.log.Fatal(error)
@@ -32,6 +34,12 @@ func (rawClient *RawClient) readBody(conn *net.TCPConn) uint64 {
 	return uint64(readSize)
 }
 
-func (rawClient *RawClient) OnConnected(conn *net.TCPConn) {
-	rawClient.readBody(conn)
+func (rawClient *RawClient) OnConnected(conn *net.TCPConn, wg *sync.WaitGroup) {
+	defer wg.Done()
+	// rawClient.readBody(conn)
+	b := []byte("ABC€")
+	h := make([]byte, 8)
+	binary.BigEndian.PutUint64(h, uint64(len(b)))
+	conn.Write(h)
+	conn.Close()
 }

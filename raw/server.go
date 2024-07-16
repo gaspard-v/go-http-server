@@ -10,7 +10,6 @@ import (
 	tcpServer "github.com/gaspard-v/go-http-server/tcp/server"
 )
 
-const HEADER_SIZE = 4
 const CHUNK_SIZE = 4096
 
 type RawSock struct {
@@ -28,7 +27,7 @@ func CreateRawServer() *RawSock {
 	return &RawSock{log, nil}
 }
 
-func CreateRawConn(conn *net.TCPConn) *RawConn {
+func createRawConn(conn *net.TCPConn) *RawConn {
 	log := log.Get("raw.server.conn")
 	return &RawConn{log, conn}
 }
@@ -59,7 +58,7 @@ func (raw *RawConn) splitInChunk(
 }
 
 func (raw *RawConn) OnReceive() uint64 {
-	body_size, err := GetBodySize(raw.conn)
+	body_size, err := getBodySize(raw.conn)
 	if err != nil {
 		raw.log.Fatal(err)
 	}
@@ -72,7 +71,7 @@ func (raw *RawConn) OnSend() uint64 {
 
 func (raw *RawSock) OnAccept(conn *net.TCPConn, wg *sync.WaitGroup) {
 	defer wg.Done()
-	raw.tcpConn = CreateRawConn(conn)
+	raw.tcpConn = createRawConn(conn)
 	raw.tcpConn.OnReceive()
 	conn.Close()
 }

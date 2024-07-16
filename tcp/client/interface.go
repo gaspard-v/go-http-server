@@ -1,7 +1,10 @@
 package tcpClient
 
-import "net"
+import (
+	"net"
+	"sync"
+)
 
 type TcpClientSock interface {
-	OnConnected(*net.TCPConn)
+	OnConnected(*net.TCPConn, *sync.WaitGroup)
 }
